@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Administrador GitHub - Archivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .config-info {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 1.1em;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .config-info span {
+            background: #2c3e50;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 0 5px;
+            font-family: monospace;
+            color: #f1c40f;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.1em;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-area {
+            background: white;
+        }
+
+        .drop-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: #e6e9ff;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .file-list {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .gallery-media {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #2d3748;
+        }
+
+        .gallery-media.audio {
+            height: 60px;
+            padding: 10px;
+        }
+
+        .gallery-info {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .gallery-info p {
+            margin-bottom: 10px;
+            color: #4a5568;
+            word-break: break-all;
+        }
+
+        .gallery-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gallery-actions .btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Mi Administrador GitHub</h1>
+            <p>Sube y visualiza archivos en tu repositorio</p>
+        </div>
+
+        <div class="config-info">
+            Configuración activa: Usuario <span>SrC033</span> | Repositorio <span>Mis-Archivo</span> | Token configurado ✅
+        </div>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('upload')">📤 Subir Archivos</button>
+            <button class="tab" onclick="switchTab('view')">👁️ Ver Archivos</button>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Pestaña de Subida -->
+        <div id="upload-tab" class="tab-content active">
+            <div class="upload-area">
+                <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📤</div>
+                    <p>Arrastra y suelta tus archivos aquí o haz clic para seleccionar</p>
+                    <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Seleccionar Archivos</button>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <div class="file-list" id="fileList" style="display: none;">
+                    <h3>Archivos Pendientes</h3>
+                    <div id="pendingFiles"></div>
+                    <button class="btn" onclick="uploadAllFiles()" style="margin-top: 20px; width: 100%;">Subir Todos a GitHub</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña de Visualización -->
+        <div id="view-tab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Archivos en el Repositorio</h2>
+                <button class="btn" onclick="loadFiles()">↻ Actualizar Lista</button>
+            </div>
+            <div id="filesGallery" class="gallery"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración fija con tus datos
+        const GITHUB_TOKEN = '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';
+        const REPO_OWNER = 'SrC033';
+        const REPO_NAME = 'Mis-Archivo';
+
+        let pendingFiles = [];
+
+        // Cambiar entre pestañas
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'upload') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('upload-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('view-tab').classList.add('active');
+                loadFiles(); // Cargar archivos al cambiar a la pestaña de ver
+            }
+        }
+
+        // Funciones de utilidad
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Funciones de arrastrar y soltar
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            for (let file of files) {
+                pendingFiles.push(file);
+            }
+            updateFileList();
+            document.getElementById('fileList').style.display = 'block';
+            document.getElementById('fileInfo').textContent = `${pendingFiles.length} archivo(s) seleccionado(s)`;
+        }
+
+        function updateFileList() {
+            const container = document.getElementById('pendingFiles');
+            container.innerHTML = '';
+            
+            pendingFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                let icon = '📄';
+                if (file.type.startsWith('image/')) icon = '🖼️';
+                else if (file.type.startsWith('video/')) icon = '🎥';
+                else if (file.type.startsWith('audio/')) icon = '🎵';
+                
+                fileItem.innerHTML = `
+                    <div class="file-details">
+                        <span class="file-icon">${icon}</span>
+                        <span class="file-name">${file.name}</span>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn btn-icon" onclick="removeFile(${index})">Eliminar</button>
+                    </div>
+                `;
+                
+                container.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            pendingFiles.splice(index, 1);
+            updateFileList();
+            document.getElementById('fileInfo').textContent = `${pendingFiles.length} archivo(s) seleccionado(s)`;
+            
+            if (pendingFiles.length === 0) {
+                document.getElementById('fileList').style.display = 'none';
+            }
+        }
+
+        // Subir archivos
+        async function uploadAllFiles() {
+            if (pendingFiles.length === 0) {
+                showAlert('No hay archivos para subir', 'error');
+                return;
+            }
+
+            showAlert('Subiendo archivos...', 'success');
+
+            for (let file of pendingFiles) {
+                try {
+                    const reader = new FileReader();
+                    
+                    const content = await new Promise((resolve, reject) => {
+                        reader.onload = () => {
+                            const base64 = reader.result.split(',')[1];
+                            resolve(base64);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+
+                    const path = `uploads/${Date.now()}_${file.name}`;
+                    
+                    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Subir archivo: ${file.name}`,
+                            content: content
+                        })
+                    });
+
+                    if (response.ok) {
+                        showAlert(`✅ ${file.name} subido exitosamente`, 'success');
+                    } else {
+                        const error = await response.json();
+                        showAlert(`❌ Error al subir ${file.name}: ${error.message}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(`❌ Error al subir ${file.name}: ${error.message}`, 'error');
+                }
+            }
+
+            pendingFiles = [];
+            updateFileList();
+            document.getElementById('fileList').style.display = 'none';
+            document.getElementById('fileInfo').textContent = '';
+        }
+
+        // Cargar y visualizar archivos
+        async function loadFiles() {
+            const gallery = document.getElementById('filesGallery');
+            gallery.innerHTML = '<div class="loading">Cargando archivos...</div>';
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/uploads`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        gallery.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">📁 La carpeta "uploads" aún no existe. Sube algún archivo para crearla.</div>';
+                        return;
+                    }
+                    throw new Error('Error al cargar archivos');
+                }
+
+                const files = await response.json();
+                
+                if (files.length === 0) {
+                    gallery.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">📁 No hay archivos en la carpeta uploads</div>';
+                    return;
+                }
+
+                gallery.innerHTML = '';
+                
+                files.forEach(file => {
+                    if (file.type === 'file') {
+                        const item = document.createElement('div');
+                        item.className = 'gallery-item';
+                        
+                        const fileExt = file.name.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);
+                        const isVideo = ['mp4', 'webm', 'ogg'].includes(fileExt);
+                        const isAudio = ['mp3', 'wav', 'ogg'].includes(fileExt);
+                        
+                        let mediaHtml = '';
+                        if (isImage) {
+                            mediaHtml = `<img src="${file.download_url}" class="gallery-media" alt="${file.name}" onerror="this.src='https://via.placeholder.com/300?text=Error+carga'">`;
+                        } else if (isVideo) {
+                            mediaHtml = `<video src="${file.download_url}" class="gallery-media" controls></video>`;
+                        } else if (isAudio) {
+                            mediaHtml = `<audio src="${file.download_url}" class="gallery-media audio" controls></audio>`;
+                        } else {
+                            mediaHtml = `<div style="height:200px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:48px;">📄</div>`;
+                        }
+                        
+                        item.innerHTML = `
+                            ${mediaHtml}
+                            <div class="gallery-info">
+                                <p><strong>${file.name}</strong></p>
+                                <div class="gallery-actions">
+                                    <a href="${file.download_url}" target="_blank" class="btn btn-icon" style="text-decoration:none; text-align:center;">🔍 Ver</a>
+                                    <a href="${file.download_url}" download class="btn btn-icon btn-secondary" style="text-decoration:none; text-align:center;">⬇️ Descargar</a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        gallery.appendChild(item);
+                    }
+                });
+            } catch (error) {
+                gallery.innerHTML = `<div style="text-align: center; padding: 40px; color: #e53e3e;">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Cargar archivos automáticamente al inicio si la pestaña de ver está activa
+        if (document.getElementById('view-tab').classList.contains('active')) {
+            loadFiles();
+        }
+    </script>
+</body>
+</html>
