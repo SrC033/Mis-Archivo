@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Administrador GitHub - Archivos</title>
+    <style>
+        /* Mismos estilos que antes - mantenlos igual */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .config-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.1em;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .drop-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: #e6e9ff;
+        }
+
+        .file-list {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .gallery-media {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #2d3748;
+        }
+
+        .gallery-media.audio {
+            height: 60px;
+            padding: 10px;
+        }
+
+        .gallery-info {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeeba;
+        }
+
+        @media (max-width: 768px) {
+            .config-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Administrador de Archivos GitHub</h1>
+            <p>Configuración segura - Ingresa tu token cada vez</p>
+        </div>
+
+        <div class="config-section">
+            <div class="warning">
+                ⚠️ <strong>Importante:</strong> Tu token solo se guarda en esta sesión del navegador. 
+                Por seguridad, debes ingresarlo cada vez que uses la página.
+            </div>
+            <div class="config-form">
+                <div class="form-group">
+                    <label>🔑 GitHub Token</label>
+                    <input type="password" id="githubToken" placeholder="Ingresa tu token" value="">
+                </div>
+                <div class="form-group">
+                    <label>👤 Dueño</label>
+                    <input type="text" id="repoOwner" value="SrC033" readonly style="background:#e9ecef;">
+                </div>
+                <div class="form-group">
+                    <label>📁 Repositorio</label>
+                    <input type="text" id="repoName" value="Mis-Archivo" readonly style="background:#e9ecef;">
+                </div>
+                <button class="btn" onclick="testConnection()">🔌 Probar Conexión</button>
+            </div>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('upload')">📤 Subir Archivos</button>
+            <button class="tab" onclick="switchTab('view')">👁️ Ver Archivos</button>
+        </div>
+
+        <!-- Pestaña de Subida -->
+        <div id="upload-tab" class="tab-content active">
+            <div class="upload-area">
+                <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📤</div>
+                    <p>Arrastra y suelta tus archivos aquí o haz clic para seleccionar</p>
+                    <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Seleccionar Archivos</button>
+                    <div id="fileInfo"></div>
+                </div>
+
+                <div class="file-list" id="fileList" style="display: none;">
+                    <h3>Archivos Pendientes</h3>
+                    <div id="pendingFiles"></div>
+                    <button class="btn" onclick="uploadAllFiles()" style="margin-top: 20px; width: 100%;">Subir Todos a GitHub</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña de Visualización -->
+        <div id="view-tab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Archivos en el Repositorio</h2>
+                <button class="btn" onclick="loadFiles()">↻ Actualizar Lista</button>
+            </div>
+            <div id="filesGallery" class="gallery"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let pendingFiles = [];
+        let currentToken = '';
+
+        // Funciones de utilidad
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function getToken() {
+            const token = document.getElementById('githubToken').value.trim();
+            if (!token) {
+                showAlert('⚠️ Por favor ingresa tu token de GitHub', 'error');
+                return null;
+            }
+            return token;
+        }
+
+        // Cambiar entre pestañas
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'upload') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('upload-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('view-tab').classList.add('active');
+                loadFiles();
+            }
+        }
+
+        // Probar conexión
+        async function testConnection() {
+            const token = getToken();
+            if (!token) return;
+
+            const owner = document.getElementById('repoOwner').value;
+            const repo = document.getElementById('repoName').value;
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('✅ Conexión exitosa con GitHub', 'success');
+                } else {
+                    showAlert('❌ Error: Token inválido o sin permisos', 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Error de conexión', 'error');
+            }
+        }
+
+        // Funciones de arrastrar y soltar
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('dragover');
+            handleFiles(event.dataTransfer.files);
+        }
+
+        function handleFileSelect(event) {
+            handleFiles(event.target.files);
+        }
+
+        function handleFiles(files) {
+            for (let file of files) {
+                pendingFiles.push(file);
+            }
+            updateFileList();
+            document.getElementById('fileList').style.display = 'block';
+            document.getElementById('fileInfo').textContent = `${pendingFiles.length} archivo(s) seleccionado(s)`;
+        }
+
+        function updateFileList() {
+            const container = document.getElementById('pendingFiles');
+            container.innerHTML = '';
+            
+            pendingFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                let icon = '📄';
+                if (file.type.startsWith('image/')) icon = '🖼️';
+                else if (file.type.startsWith('video/')) icon = '🎥';
+                else if (file.type.startsWith('audio/')) icon = '🎵';
+                
+                fileItem.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <span style="font-size:24px;">${icon}</span>
+                        <span style="font-weight:600;">${file.name}</span>
+                    </div>
+                    <button class="btn btn-icon" onclick="removeFile(${index})" style="padding:5px 10px;">Eliminar</button>
+                `;
+                
+                container.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            pendingFiles.splice(index, 1);
+            updateFileList();
+            document.getElementById('fileInfo').textContent = `${pendingFiles.length} archivo(s) seleccionado(s)`;
+            
+            if (pendingFiles.length === 0) {
+                document.getElementById('fileList').style.display = 'none';
+            }
+        }
+
+        // Subir archivos
+        async function uploadAllFiles() {
+            const token = getToken();
+            if (!token) return;
+
+            if (pendingFiles.length === 0) {
+                showAlert('No hay archivos para subir', 'error');
+                return;
+            }
+
+            const owner = document.getElementById('repoOwner').value;
+            const repo = document.getElementById('repoName').value;
+
+            showAlert('Subiendo archivos...', 'success');
+
+            for (let file of pendingFiles) {
+                try {
+                    const reader = new FileReader();
+                    
+                    const content = await new Promise((resolve, reject) => {
+                        reader.onload = () => {
+                            const base64 = reader.result.split(',')[1];
+                            resolve(base64);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+
+                    const path = `uploads/${Date.now()}_${file.name}`;
+                    
+                    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Subir archivo: ${file.name}`,
+                            content: content
+                        })
+                    });
+
+                    if (response.ok) {
+                        showAlert(`✅ ${file.name} subido exitosamente`, 'success');
+                    } else {
+                        const error = await response.json();
+                        showAlert(`❌ Error: ${error.message}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(`❌ Error al subir ${file.name}`, 'error');
+                }
+            }
+
+            pendingFiles = [];
+            updateFileList();
+            document.getElementById('fileList').style.display = 'none';
+            document.getElementById('fileInfo').textContent = '';
+        }
+
+        // Cargar archivos
+        async function loadFiles() {
+            const token = getToken();
+            if (!token) return;
+
+            const gallery = document.getElementById('filesGallery');
+            gallery.innerHTML = '<div style="text-align:center; padding:40px;">Cargando archivos...</div>';
+
+            const owner = document.getElementById('repoOwner').value;
+            const repo = document.getElementById('repoName').value;
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/uploads`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        gallery.innerHTML = '<div style="text-align:center; padding:40px;">📁 La carpeta "uploads" aún no existe. Sube algún archivo para crearla.</div>';
+                        return;
+                    }
+                    throw new Error('Error al cargar');
+                }
+
+                const files = await response.json();
+                
+                if (files.length === 0) {
+                    gallery.innerHTML = '<div style="text-align:center; padding:40px;">No hay archivos en uploads</div>';
+                    return;
+                }
+
+                gallery.innerHTML = '';
+                
+                files.forEach(file => {
+                    if (file.type === 'file') {
+                        const item = document.createElement('div');
+                        item.className = 'gallery-item';
+                        
+                        const fileExt = file.name.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);
+                        const isVideo = ['mp4', 'webm', 'ogg'].includes(fileExt);
+                        const isAudio = ['mp3', 'wav', 'ogg'].includes(fileExt);
+                        
+                        let mediaHtml = '';
+                        if (isImage) {
+                            mediaHtml = `<img src="${file.download_url}" class="gallery-media" alt="${file.name}">`;
+                        } else if (isVideo) {
+                            mediaHtml = `<video src="${file.download_url}" class="gallery-media" controls></video>`;
+                        } else if (isAudio) {
+                            mediaHtml = `<audio src="${file.download_url}" class="gallery-media audio" controls></audio>`;
+                        } else {
+                            mediaHtml = `<div style="height:200px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:48px;">📄</div>`;
+                        }
+                        
+                        item.innerHTML = `
+                            ${mediaHtml}
+                            <div class="gallery-info">
+                                <p><strong>${file.name}</strong></p>
+                                <div style="display:flex; gap:10px;">
+                                    <a href="${file.download_url}" target="_blank" class="btn" style="flex:1; text-decoration:none; text-align:center; padding:8px;">🔍 Ver</a>
+                                    <a href="${file.download_url}" download class="btn btn-secondary" style="flex:1; text-decoration:none; text-align:center; padding:8px;">⬇️ Descargar</a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        gallery.appendChild(item);
+                    }
+                });
+            } catch (error) {
+                gallery.innerHTML = `<div style="text-align:center; padding:40px; color:#e53e3e;">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
