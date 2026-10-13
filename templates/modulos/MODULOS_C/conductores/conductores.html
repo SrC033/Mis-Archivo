@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📡 Chat Conductores | GSN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/conductores.css">
+</head>
+<body>
+
+<div class="modal-overlay active" id="modalPresentacion">
+    <div class="modal-content">
+        <div class="icono-modal">📡</div>
+        <h2>🚛 Chat de Conductores</h2>
+        <p>Comunicación en tiempo real para conductores de flota.<br>Tu ubicación GPS se envía automáticamente con cada mensaje.</p>
+        <button class="btn-principal" id="btnComenzar"><i class="fas fa-arrow-right"></i> Comenzar</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalPermisoUbicacion">
+    <div class="modal-content">
+        <div class="icono-modal" style="color:#f87171;">📍</div>
+        <h2 style="color:#f87171;">Ubicación Obligatoria</h2>
+        <p>Para usar el chat, <strong style="color:#f87171;">debes activar el GPS</strong>.<br>Tu ubicación se envía con cada mensaje de forma automática.</p>
+        <div id="statusUbicacion" style="background:rgba(56,189,248,0.04);border-radius:14px;padding:10px;margin-bottom:14px;font-size:0.65rem;color:rgba(255,255,255,0.3);min-height:36px;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <i class="fas fa-info-circle"></i> Presiona "Activar Ubicación"
+        </div>
+        <button class="btn-principal" id="btnPermitirUbicacion"><i class="fas fa-location-dot"></i> Activar Ubicación</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalIdConductor">
+    <div class="modal-content">
+        <div class="icono-modal" style="color:#38bdf8;">🪪</div>
+        <h2>👤 Identifícate</h2>
+        <p>Ingresa tu <strong>ID de conductor</strong> registrado en la flota.</p>
+        <input type="text" id="inputIdConductor" placeholder="Ej: CON-001" maxlength="20" autocomplete="off">
+        <button class="btn-principal" id="btnIngresarConductor"><i class="fas fa-search"></i> Verificar</button>
+        <div class="mensaje-modal" id="mensajeVerificacion"></div>
+    </div>
+</div>
+
+<div class="modal-imagen" id="modalImagen" onclick="cerrarModalImagen()">
+    <span class="cerrar-modal-imagen">&times;</span>
+    <img id="imagenAmpliada" src="" alt="Imagen ampliada">
+</div>
+
+<div class="chat-container" id="chatContainer">
+
+    <div class="chat-header">
+        <div class="info" id="avatarClick" title="Presiona para cambiar de usuario">
+            <div class="avatar estado-desconectado" id="avatarStatus">
+                <i class="fas fa-user"></i>
+                <span class="avatar-status-dot desconectado" id="avatarDot"></span>
+            </div>
+            <div>
+                <div class="nombre" id="nombreConductorHeader">Conductor</div>
+                <div class="estado"><span class="dot"></span> <span id="contadorConectados">0</span> conectados</div>
+            </div>
+        </div>
+        <div class="acciones">
+            <button onclick="enviarImagenPrueba()" class="btn-test-img" title="Enviar imagen de prueba">
+                <i class="fas fa-image"></i> Test
+            </button>
+            <button onclick="reenviarPendientes()" class="btn-reenviar-pendientes" title="Reenviar mensajes pendientes">
+                <i class="fas fa-sync-alt"></i> Reenviar
+            </button>
+            <button onclick="limpiarMensajesPropios()" class="btn-limpiar" title="Eliminar solo tus mensajes">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="server-status-bar" id="serverStatusBar">
+        <span><span class="server-dot off" id="serverDot"></span> <span id="serverStatusText" class="server-text">Inicializando...</span></span>
+        <span id="serverInfo">v10.2 · <span id="totalConductoresStatus">0</span> conductores</span>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="empty-messages">
+            <i class="fas fa-comments"></i>
+            <p>No hay mensajes</p>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="file" id="fileInput" accept="*/*" style="display:none;">
+        
+        <div class="input-row">
+            <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." autocomplete="off" disabled>
+            <button class="btn-archivo-solo" id="btnArchivo" onclick="abrirExploradorArchivos()" title="Adjuntar archivo">
+                <span class="icon-wrapper"><i class="fas fa-paperclip"></i><span class="badge-archivos" id="badgeArchivos" style="display:none;">0</span></span>
+            </button>
+            <button id="btnEnviar" onclick="enviarMensaje()" disabled><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <div class="archivos-seleccionados" id="archivosSeleccionados"></div>
+        <div class="upload-progress" id="uploadProgress">
+            <div class="bar" id="progressBar"></div>
+        </div>
+    </div>
+</div>
+
+<script src="js/conductores.js"></script>
+</body>
+</html>

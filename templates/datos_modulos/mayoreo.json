@@ -1,0 +1,37 @@
+{
+  "total": {
+    "volumen": 2005268,
+    "ventas": 315552628,
+    "margen": 15162860,
+    "margen_pct": 4.81,
+    "registros": 617
+  },
+  "meses": [
+    {
+      "mes": "junio",
+      "volumen": 812500,
+      "ventas": 128509453,
+      "margen": 6127744,
+      "margen_pct": 4.77,
+      "registros": 232
+    },
+    {
+      "mes": "julio",
+      "volumen": 770088,
+      "ventas": 122942370,
+      "margen": 6267859,
+      "margen_pct": 5.1,
+      "registros": 244
+    },
+    {
+      "mes": "agosto",
+      "volumen": 422680,
+      "ventas": 64100804,
+      "margen": 2767258,
+      "margen_pct": 4.32,
+      "registros": 141
+    }
+  ],
+  "timestamp": "2026-08-20T22:38:41.757Z",
+  "ultima_actualizacion": "20/8/2026, 4:38:41 p. m."
+}

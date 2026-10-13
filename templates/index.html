@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grupo GSN · Control de Distribución</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #04101a;
+            color: #f1f7fa;
+            font-family: 'Inter', -apple-system, Segoe UI, Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        #particlesCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #splash {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 720px;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-wrapper {
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(18, 184, 166, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+        }
+
+        .logo-icon {
+            position: relative;
+            font-size: 80px;
+            font-weight: 900;
+            color: #12b8a6;
+            letter-spacing: 4px;
+            text-shadow: 0 0 60px rgba(18, 184, 166, 0.2);
+            line-height: 1;
+        }
+
+        .logo-icon .highlight {
+            color: #f4a016;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .logo-icon .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #f4a016, #d4880f);
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .logo-divider {
+            width: 80px;
+            height: 2px;
+            margin: 12px auto 10px auto;
+            background: linear-gradient(90deg, transparent, #12b8a6, transparent);
+            border-radius: 2px;
+            animation: expandWidth 1.5s ease-out forwards;
+            transform: scaleX(0);
+        }
+
+        @keyframes expandWidth {
+            to { transform: scaleX(1); }
+        }
+
+        .logo-sub {
+            font-size: 14px;
+            font-weight: 300;
+            color: #6a9ab0;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .logo-sub .accent {
+            color: #12b8a6;
+            font-weight: 400;
+        }
+
+        .version-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 2px 16px;
+            background: rgba(18, 184, 166, 0.08);
+            border: 1px solid rgba(18, 184, 166, 0.15);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #3a8a9a;
+            letter-spacing: 2px;
+        }
+
+        .loader-wrapper {
+            width: 100%;
+            max-width: 380px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .loader-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .loader-track .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #12b8a6, #35d3cd, #12b8a6);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: shimmer 2s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loader-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #4a7a8a;
+        }
+
+        .loader-info .pct {
+            font-weight: 600;
+            font-size: 14px;
+            color: #12b8a6;
+            font-variant-numeric: tabular-nums;
+            min-width: 42px;
+            text-align: right;
+        }
+
+        .loader-info .status {
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            transition: opacity 0.3s ease;
+        }
+
+        .loader-info .status .dot-pulse {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #12b8a6;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: dotPulse 1.2s ease-in-out infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .tagline {
+            margin-top: 40px;
+            font-size: 12px;
+            font-weight: 300;
+            color: #3a6a7a;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            animation: fadeInUp 2s ease forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        .tagline strong {
+            color: #12b8a6;
+            font-weight: 500;
+        }
+
+        .corner-decoration {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border: 1px solid rgba(18, 184, 166, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatCorner 8s ease-in-out infinite;
+        }
+
+        .corner-decoration.tl { top: 30px; left: 30px; animation-delay: 0s; }
+        .corner-decoration.tr { top: 30px; right: 30px; animation-delay: 2s; }
+        .corner-decoration.bl { bottom: 30px; left: 30px; animation-delay: 4s; }
+        .corner-decoration.br { bottom: 30px; right: 30px; animation-delay: 6s; }
+
+        @keyframes floatCorner {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            25% { transform: translate(8px, -8px) scale(1.05); opacity: 0.6; }
+            50% { transform: translate(0, 0) scale(0.95); opacity: 0.3; }
+            75% { transform: translate(-8px, 8px) scale(1.02); opacity: 0.5; }
+        }
+
+        .corner-decoration .inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(18, 184, 166, 0.08);
+            border-radius: 50%;
+        }
+
+        /* ==========================================================
+           RESPONSIVE
+           ========================================================== */
+        @media (max-width: 600px) {
+            .logo-icon { font-size: 56px; }
+            .logo-sub { font-size: 11px; letter-spacing: 5px; }
+            .loader-wrapper { max-width: 280px; }
+            .tagline { font-size: 10px; letter-spacing: 2px; }
+            .corner-decoration { width: 40px; height: 40px; }
+            .corner-decoration .inner { width: 14px; height: 14px; }
+            .corner-decoration.tl { top: 16px; left: 16px; }
+            .corner-decoration.tr { top: 16px; right: 16px; }
+            .corner-decoration.bl { bottom: 16px; left: 16px; }
+            .corner-decoration.br { bottom: 16px; right: 16px; }
+            .logo-glow { width: 140px; height: 140px; }
+            .version-tag { font-size: 8px; padding: 1px 12px; }
+        }
+
+        @media (max-width: 400px) {
+            .logo-icon { font-size: 42px; letter-spacing: 2px; }
+            .logo-sub { font-size: 9px; letter-spacing: 3px; }
+            .loader-wrapper { max-width: 220px; }
+            .loader-info { font-size: 10px; }
+            .loader-info .pct { font-size: 12px; min-width: 34px; }
+            .tagline { font-size: 8px; letter-spacing: 1.5px; margin-top: 30px; }
+            .corner-decoration { width: 30px; height: 30px; }
+            .corner-decoration .inner { width: 10px; height: 10px; }
+            .corner-decoration.tl { top: 10px; left: 10px; }
+            .corner-decoration.tr { top: 10px; right: 10px; }
+            .corner-decoration.bl { bottom: 10px; left: 10px; }
+            .corner-decoration.br { bottom: 10px; right: 10px; }
+            .logo-glow { width: 100px; height: 100px; }
+            .version-tag { font-size: 7px; padding: 1px 10px; margin-top: 6px; }
+        }
+
+        @media (max-height: 500px) {
+            .logo-icon { font-size: 40px; }
+            .logo-wrapper { margin-bottom: 14px; }
+            .loader-wrapper { margin-top: 20px; }
+            .tagline { margin-top: 20px; font-size: 9px; }
+            .corner-decoration { display: none; }
+            .logo-glow { width: 100px; height: 100px; }
+        }
+
+        @media (min-height: 900px) {
+            .logo-icon { font-size: 100px; }
+            .logo-wrapper { margin-bottom: 40px; }
+            .loader-wrapper { max-width: 460px; }
+            .tagline { font-size: 16px; margin-top: 50px; }
+            .corner-decoration { width: 80px; height: 80px; }
+            .corner-decoration .inner { width: 28px; height: 28px; }
+            .logo-glow { width: 250px; height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PARTICULAS -->
+    <canvas id="particlesCanvas"></canvas>
+
+    <!-- DECORACIONES -->
+    <div class="corner-decoration tl"><div class="inner"></div></div>
+    <div class="corner-decoration tr"><div class="inner"></div></div>
+    <div class="corner-decoration bl"><div class="inner"></div></div>
+    <div class="corner-decoration br"><div class="inner"></div></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="splash">
+        <div class="logo-wrapper">
+            <div class="logo-glow"></div>
+            <div class="logo-icon">
+                G<span class="highlight">SN</span>
+            </div>
+            <div class="logo-divider"></div>
+            <div class="logo-sub">
+                <span class="accent">●</span> Control de Distribución <span class="accent">●</span>
+            </div>
+            <div class="version-tag">v3.0 · Grupo GSN</div>
+        </div>
+
+        <div class="loader-wrapper">
+            <div class="loader-track">
+                <div class="fill" id="splashProgress"></div>
+            </div>
+            <div class="loader-info">
+                <span class="status" id="splashStatus">
+                    <span class="dot-pulse"></span> Inicializando...
+                </span>
+                <span class="pct" id="splashPercent">0%</span>
+            </div>
+        </div>
+
+        <div class="tagline">
+            <strong>Suministramos energía</strong> · impulsamos tu operación
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // PARTICULAS
+        // ============================================================
+        (function() {
+            const canvas = document.getElementById('particlesCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const PARTICLE_COUNT = 60;
+            const MAX_SPEED = 0.6;
+            const CONNECTION_DIST = 130;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            function createParticles() {
+                particles = [];
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * MAX_SPEED * 2,
+                        vy: (Math.random() - 0.5) * MAX_SPEED * 2,
+                        radius: 1.2 + Math.random() * 1.5,
+                        opacity: 0.2 + Math.random() * 0.4
+                    });
+                }
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < CONNECTION_DIST) {
+                            const alpha = 0.08 * (1 - dist / CONNECTION_DIST);
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(18, 184, 166, ${alpha})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                for (const p of particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
+                    grad.addColorStop(0, `rgba(18, 184, 166, ${p.opacity})`);
+                    grad.addColorStop(1, `rgba(18, 184, 166, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * 0.4, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * 0.5})`;
+                    ctx.fill();
+                }
+            }
+
+            function updateParticles() {
+                for (const p of particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    p.x = Math.max(0, Math.min(width, p.x));
+                    p.y = Math.max(0, Math.min(height, p.y));
+                }
+            }
+
+            function animate() {
+                updateParticles();
+                drawParticles();
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => {
+                resize();
+                createParticles();
+            });
+
+            resize();
+            createParticles();
+            animate();
+        })();
+
+        // ============================================================
+        // ✅ RUTAS DE DESTINO - Estructura real confirmada
+        // ============================================================
+        // El index.html está en: templates/index.html
+        // El main.html real está en: templates/modulos/main.html
+        // Por lo tanto la ruta relativa correcta es:
+        //   modulos/main.html
+        // ============================================================
+        const RUTAS_DESTINO = [
+            'modulos/main.html',                                       // ✅ RUTA PRINCIPAL CORRECTA
+            'modulos/MODULOS_C/DASHBOARD/main.html',                   // Fallback por si mueven el archivo
+            'modulos/MODULOS_C/DASHBOARD/index.html',                  // Fallback alternativo
+            'main.html',                                               // Último recurso
+            'dashboard.html'                                           // Último recurso
+        ];
+
+        // ============================================================
+        // PROGRESO Y REDIRECCION AUTOMATICA
+        // ============================================================
+        (function() {
+            const progressBar = document.getElementById('splashProgress');
+            const percentEl = document.getElementById('splashPercent');
+            const statusEl = document.getElementById('splashStatus');
+
+            const steps = [
+                { pct: 10, msg: 'Conectando a la fuente de datos...', icon: '🔌' },
+                { pct: 25, msg: 'Autenticando con servidor...', icon: '🔐' },
+                { pct: 40, msg: 'Cargando configuración del sistema...', icon: '⚙️' },
+                { pct: 55, msg: 'Inicializando módulos de visualización...', icon: '📊' },
+                { pct: 70, msg: 'Preparando el dashboard...', icon: '🔄' },
+                { pct: 85, msg: 'Casi listo...', icon: '🚀' },
+                { pct: 95, msg: 'Optimizando experiencia...', icon: '✨' },
+                { pct: 100, msg: '¡Sistema listo!', icon: '✅' }
+            ];
+
+            let redirigido = false;
+
+            function updateSplash(pct, msg) {
+                const progress = Math.min(pct, 100);
+                progressBar.style.width = progress + '%';
+                percentEl.textContent = Math.round(progress) + '%';
+
+                if (msg) {
+                    const icon = steps.find(s => s.pct === pct)?.icon || '●';
+                    statusEl.innerHTML = `<span class="dot-pulse"></span> ${icon} ${msg}`;
+                }
+
+                if (progress >= 100 && !redirigido) {
+                    redirigido = true;
+                    progressBar.style.background = 'linear-gradient(90deg, #50b95a, #35d3cd)';
+                    
+                    console.log('🚀 Redirigiendo a:', RUTAS_DESTINO[0]);
+                    
+                    // ✅ Redirección con fallback inteligente
+                    setTimeout(() => {
+                        intentarRedireccion(0);
+                    }, 1200);
+                }
+            }
+
+            function intentarRedireccion(index) {
+                if (index >= RUTAS_DESTINO.length) {
+                    console.error('❌ No se encontró ninguna ruta válida');
+                    statusEl.innerHTML = `<span class="dot-pulse"></span> ❌ Error: no se encontró el dashboard`;
+                    return;
+                }
+
+                const ruta = RUTAS_DESTINO[index];
+                console.log(`🔎 Probando ruta ${index + 1}/${RUTAS_DESTINO.length}: ${ruta}`);
+
+                // Verificar si la ruta existe usando fetch HEAD
+                fetch(ruta, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ Ruta válida encontrada: ${ruta}`);
+                            window.location.href = ruta;
+                        } else {
+                            console.warn(`⚠️ Ruta ${ruta} respondió con ${response.status}`);
+                            intentarRedireccion(index + 1);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn(`⚠️ Error probando ${ruta}:`, err.message);
+                        intentarRedireccion(index + 1);
+                    });
+            }
+
+            function nextStep(index) {
+                if (index >= steps.length) {
+                    updateSplash(100, '¡Sistema listo!');
+                    return;
+                }
+
+                const step = steps[index];
+                updateSplash(step.pct, step.msg);
+
+                const delays = [800, 600, 500, 700, 600, 500, 400, 300];
+                const delay = delays[index] || 500;
+
+                setTimeout(() => {
+                    nextStep(index + 1);
+                }, delay);
+            }
+
+            // Iniciar la secuencia
+            setTimeout(() => {
+                nextStep(0);
+            }, 400);
+        })();
+
+        // ============================================================
+        // EFECTO DE PARPADEO EN EL LOGO
+        // ============================================================
+        (function() {
+            const logo = document.querySelector('.logo-icon');
+            if (logo) {
+                setInterval(() => {
+                    const highlight = logo.querySelector('.highlight');
+                    if (highlight) {
+                        highlight.style.transition = 'color 0.3s ease';
+                        highlight.style.color = '#f4a016';
+                        setTimeout(() => {
+                            highlight.style.color = '';
+                        }, 300);
+                    }
+                }, 4000);
+            }
+        })();
+
+        console.log('🎬 Presentacion GSN v3.0 cargada');
+        console.log('📱 Rutas candidatas:');
+        RUTAS_DESTINO.forEach((r, i) => console.log(`   ${i + 1}. ${r}`));
+    </script>
+</body>
+</html>

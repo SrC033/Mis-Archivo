@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=yes">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Entregas · Grupo GSN · Futurista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- HEADER CON FILTROS -->
+    <header class="header-with-filters">
+        <div class="header-title">
+            <h1 id="viewTitle">Control de Entregas</h1>
+            <p id="viewSubtitle">Seguimiento cronológico de operaciones</p>
+        </div>
+
+        <div class="filters-row" id="filtersGeneral">
+            <label>📅 PERIODO<select id="period"><option value="Todos">Todos</option></select></label>
+            <label>CLIENTE<select id="client"><option value="Todos">Todos</option></select></label>
+            <label>COMBUSTIBLE<select id="fuel"><option value="Todos">Todos</option></select></label>
+            <label>FLOTA<select id="fleet"><option value="Todas">Todas</option></select></label>
+        </div>
+    </header>
+
+    <!-- LAYOUT 2 COLUMNAS -->
+    <div class="main-layout">
+
+        <!-- COLUMNA IZQUIERDA: KPIs + Gráficas + Panel unificado -->
+        <div class="col-left">
+
+            <!-- KPIs: Entregas + General -->
+            <div class="kpis-container" id="kpisContainer">
+                <div class="kpi-block general-block">
+                    <div class="block-title">
+                        <span>📊 General</span>
+                        <span class="title-line"></span>
+                    </div>
+                    <div class="kpi-grid" id="generalKpisGrid"></div>
+                </div>
+                <div class="kpi-block fuel-block">
+                    <div class="block-title">
+                        <span>📦 Entregas</span>
+                        <span class="title-line"></span>
+                    </div>
+                    <div class="kpi-grid" id="fuelKpisGrid"></div>
+                </div>
+            </div>
+
+            <!-- Gráficas medianas -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-card-title">
+                        <span>📊 Entregas por estado</span>
+                        <span class="source-badge" id="chartDeliveryBadge">Completas / Parciales</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="deliveryChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-title">
+                        <span>📈 Volumen de entregas</span>
+                        <span class="source-badge" style="border-color:rgba(255,95,210,0.3);color:var(--neon-pink);background:rgba(255,95,210,0.06);">Últimos 15 días</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel unificado: Entregas + Alerts -->
+            <div class="unified-panel">
+                <article class="panel fulfill" id="fulfill"></article>
+                <article class="panel alerts alerts-below" id="alerts"></article>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: SOLO la tabla -->
+        <div class="col-right">
+            <div class="table-panel">
+
+                <div class="table-header">
+                    <div>
+                        <h2>📋 Detalle de entregas</h2>
+                        <small id="count">0 operaciones encontradas</small>
+                    </div>
+                    <div class="table-actions">
+                        <input class="search-mini" id="search" placeholder="Buscar..." autocomplete="off">
+                        <button class="btn-export-mini excel" onclick="exportarExcel()">📊 Excel</button>
+                        <button class="btn-export-mini pdf" onclick="exportarPDF()">📄 PDF</button>
+                    </div>
+                </div>
+
+                <div class="table-scroll" id="tableWrapper">
+                    <table>
+                        <thead id="tableHeader">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Pedido</th>
+                                <th>Placa</th>
+                                <th>Conductor</th>
+                                <th>Solicitado</th>
+                                <th>Despachado</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rows"></tbody>
+                    </table>
+                </div>
+
+                <div class="pager">
+                    <span id="showing"></span>
+                    <div>
+                        <button id="prev">‹</button>
+                        <b id="page"></b>
+                        <button id="next">›</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOOLTIP -->
+    <div id="infoTooltip">
+        <div class="tt-header">
+            <div class="tt-title" id="ttTitle">Informacion</div>
+            <button class="tt-close" onclick="hideInfoTooltip()">×</button>
+        </div>
+        <div class="tt-body" id="ttBody">
+            <div id="ttContent">Cargando informacion...</div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span id="toastMessage">Operación completada</span>
+        <button class="toast-close" onclick="hideToast()">×</button>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
