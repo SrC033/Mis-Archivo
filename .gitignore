@@ -1,0 +1,4 @@
+*.gguf
+Chat_Programar_IA_Proyecto/modelo_IA/
+__pycache__/
+*.pyc
